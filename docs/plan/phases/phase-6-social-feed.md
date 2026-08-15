@@ -30,20 +30,63 @@ Goal: given the logged-in user, return a chronologically merged list of recent m
 Scope in:
 - Read the user's follow list (via `app.bsky.graph.getFollows`).
 - For each follow, fetch recent `app.rhizome.media.entry` records (paginated, capped).
-- Merge and sort by `createdAt` desc.
+- Merge and sort by `updatedAt` desc, falling back to `createdAt` when a
+  record has never been updated. Both fields are defined in 0102 — AT
+  Protocol gives records no server-side timestamp, so if that lexicon change
+  does not land, this ticket has nothing to order by.
+- Client-supplied timestamps are not trustworthy (any user can write any
+  value to their own repo). Clamp anything in the future to "now" for
+  ordering purposes rather than letting one record pin itself to the top.
 - Cache results in memory for the session.
 Scope out: real-time updates (post-V1).
 
 ### 0604 — Anti-spoiler rule engine
-Depends on: 0103, 0405
-Goal: a pure function that, given the viewer's progression and the poster's progression on the same media, decides whether the poster's activity is a spoiler.
+Depends on: 0102, 0103, 0405
+Goal: a pure function that, given the viewer's progression and a feed entry,
+decides what of that entry is safe to show.
 Scope in:
-- `isSpoiler(viewerProgress, posterProgress, mediaType)`:
-  - film: no spoiler concept beyond "seen / not seen" — the poster having seen it is not itself a spoiler unless the entry includes a note; treat notes as spoilerable.
-  - series: spoiler if poster is ahead of viewer (later season, or same season and later episode).
-  - unknown media type: default to "spoiler" (fail closed).
-- Unit-test-worthy pure function, colocated with the progression component.
-- Documented in `docs/architecture/anti-spoiler.md`.
+- `isSpoiler(viewerProgress, entry)` where `entry` is the poster's media
+  entry — `{ mediaType, progress, note?, spoiler? }`. Passing the whole
+  entry rather than two bare progress values is the point: the same
+  "watched S03E05" is harmless on its own and unsafe with a note attached,
+  and a function that only sees progressions cannot tell those apart
+  (it would have to hide every entry, or leak every note).
+- Returns a decision, not a boolean:
+  `{ progress: "show" | "hide", note: "show" | "hide" | "absent" }`.
+  The UI needs the two separately — 0605 blurs a note while still showing
+  that someone watched *something*.
+- Rules:
+  - `spoiler === true` (author flagged their own note) → note hidden,
+    whatever the progressions say. Cheapest signal available and the author
+    is the one who knows.
+  - series — poster ahead of viewer (later season, or same season and later
+    episode) → hide both. Poster level with or behind the viewer → show
+    both: the viewer has already seen everything the entry can reveal.
+  - film — `seen: true` is not itself a spoiler, so progress always shows.
+    A note is hidden unless the viewer has also seen the film.
+  - viewer has **no entry** for that media → treat as zero progression
+    (series: S00E00; film: not seen).
+  - unknown media type or unrecognized `progress.kind` → hide both
+    (fail closed).
+- Pure and dependency-free, in `src/core/progress/` — it is the piece of
+  Rhizome most worth keeping across front ends. Unit tests cover each rule,
+  including the "viewer has no entry" and fail-closed paths.
+- Documented in `docs/architecture/anti-spoiler.md`, including the model this
+  borrows from TV Time: users declare what they have seen, and discussion is
+  anchored to the episode it concerns, so *where* a comment lives already
+  carries most of the spoiler information. Note there what V1 does not have
+  yet, and why:
+  - **Per-episode comment threads.** In V1 a note hangs off the media entry,
+    so its anchor is the poster's progression, not a specific episode. Real
+    threads need their own lexicon collection keyed by
+    `(externalRef, season, episode)` — a Phase-2 item, and the natural home
+    for the anchoring rule above.
+  - **Readers flagging someone else's note as a spoiler.** Community
+    labelling cannot be a field on a record you do not own; it needs
+    separate label records plus aggregation across repos, which is the same
+    infrastructure as the custom AppView parked in 0602. V1 ships the
+    author-side `spoiler` flag only, and the engine is written so that a
+    reader-supplied flag drops into the same decision later.
 
 ### 0605 — Feed UI with blurred spoilers
 Depends on: 0603, 0604
@@ -51,8 +94,11 @@ Goal: render the feed with spoiler content blurred/hidden by default.
 Scope in:
 - Feed page listing recent entries from follows.
 - For each entry, resolve the viewer's own progression on the same media (from their own list).
-- If `isSpoiler`, hide the title's progression details and blur any notes; otherwise show normally.
-- Clear visual affordance that content is hidden ("Spoiler for S03E05 — reveal").
+- Apply the decision from 0604 field by field: hidden progression collapses
+  to the media title alone, a hidden note is blurred in place.
+- Clear visual affordance that content is hidden ("Spoiler — reveal"), and
+  the label itself must not leak what it hides: never render
+  "Spoiler for S03E05" to a viewer who is on S02.
 
 ### 0606 — Reveal spoiler action
 Depends on: 0605

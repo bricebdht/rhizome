@@ -26,6 +26,10 @@ rewrite.
   duplication of TMDB metadata into user repos.
 - **Identity: reuse the public Bluesky PLC directory** to resolve DIDs.
   Self-hosting a PLC is a future option, not V1.
+- **Auth: AT Protocol OAuth, no app passwords** (ticket 0106). Rhizome never
+  sees a credential. The OAuth client is browser-specific and lives in
+  `src/lib/atproto/oauth/`, outside the core boundary — a native port
+  rewrites that file and keeps everything else.
 - **Backend: a small serverless proxy** only to hide TMDB (and later IGDB)
   API keys and centralize rate limiting. Everything else runs client-side.
 - **Feed aggregation (V1): pull from Bluesky follows client-side.** A custom

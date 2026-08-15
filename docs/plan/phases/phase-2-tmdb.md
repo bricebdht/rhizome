@@ -43,14 +43,25 @@ Scope in:
 - Consistent error envelope.
 - Cache TTLs longer than search (details change rarely).
 
-### 0205 — Typed TMDB client on the frontend
+### 0205 — Typed TMDB client
 Depends on: 0204
 Goal: strongly typed functions that hit the proxy; no `any` leaking into features.
 Scope in:
-- `src/lib/tmdb/` with one function per endpoint.
+- `src/core/tmdb/` with one function per endpoint. The roadmap names the
+  TMDB client as code that must survive a different front end, so it sits
+  behind the core boundary (0002, 0005) — a native app talks to the same
+  proxy with the same types.
 - Response types hand-written (small surface) or generated from TMDB's own spec.
-- Base URL from env (`VITE_TMDB_PROXY_URL`).
+- **No env access in `core/`.** The client is created from a config object:
+  `createTmdbClient({ baseUrl, fetch })`. `import.meta.env.VITE_TMDB_PROXY_URL`
+  is read once in `src/lib/tmdb/client.ts`, which builds the configured
+  instance the app uses. `import.meta.env` is Vite-specific; a React Native
+  port replaces that one file.
+- `fetch` is injected too, defaulting to the global — it keeps tests from
+  needing a network stub and costs one parameter.
 Scope out: React Query / SWR wiring (added when a feature needs it).
+Acceptance criteria:
+- `grep -r "import.meta" src/core/` returns nothing.
 
 ### 0206 — Attribution notice in the UI
 Depends on: 0205

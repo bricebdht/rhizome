@@ -27,20 +27,38 @@ Scope in:
 - `tsconfig.json` with `strict: true`, `noUncheckedIndexedAccess`, `exactOptionalPropertyTypes`.
 - `npm run lint`, `npm run typecheck`, `npm run format` scripts.
 - **Layer boundary rules** enforcing that `src/core/` stays platform-agnostic
-  (see 0005 for the layout, and the guiding decision in `roadmap.md`):
+  (see 0005 for the layout, and the guiding decision in `roadmap.md`).
+  All three of the following are needed — the import rules alone do not stop
+  a core module from reaching for a browser global:
   - `import/no-restricted-paths` — `src/core/` may not import from `app/`,
-    `features/`, `components/` or `state/`. The dependency direction is
-    one-way: the UI consumes the core, never the reverse.
+    `features/`, `components/`, `state/` **or `lib/`**. The dependency
+    direction is one-way: the UI and the platform adapters consume the core,
+    never the reverse. `lib/` is in the list because it *is* the browser
+    layer: core receives its adapters by injection (see 0009), it never
+    imports one.
   - `no-restricted-imports` scoped to `src/core/**` — bans `react`,
-    `react-dom`, and `@/components/*` / `@/features/*`.
+    `react-dom`, and the `@/app/*`, `@/components/*`, `@/features/*`,
+    `@/state/*`, `@/lib/*` aliases (the alias form bypasses
+    `no-restricted-paths`, so both rules are required).
+  - `no-restricted-globals` scoped to `src/core/**` — bans `window`,
+    `document`, `localStorage`, `sessionStorage`, `navigator`, `location`
+    and `alert`. Without this the boundary is decorative.
+- **Separate `tsconfig` for the core** — `tsconfig.core.json` extends the
+  root config, drops `"DOM"` from `lib`, and covers `src/core/**`. This is
+  what makes the guarantee structural rather than a lint rule someone can
+  disable inline: a `document` reference stops typechecking, it does not
+  merely warn. `npm run typecheck` runs both projects.
 Scope out:
 - pre-commit hooks (nice-to-have, later).
-- a separate `tsconfig` dropping the `DOM` lib from `core/` — the stronger
-  version of the same guarantee. Only if the ESLint rules prove insufficient.
+- enforcing anything about `src/lib/` itself — it is allowed to be as
+  browser-specific as it likes. That is its job.
 Acceptance criteria:
 - all three scripts pass on the scaffolded project.
-- a deliberate `import { useState } from 'react'` inside `src/core/` fails
-  `npm run lint`.
+- each of these, added deliberately inside `src/core/`, fails the checks:
+  - `import { useState } from 'react'` → fails `npm run lint`.
+  - `import { webStorage } from '@/lib/storage/web'` → fails `npm run lint`.
+  - `localStorage.getItem('x')` → fails `npm run lint` **and**
+    `npm run typecheck`.
 
 ### 0003 — Add Tailwind + shadcn/ui
 Depends on: 0001
@@ -75,7 +93,12 @@ Scope in:
   Rule of thumb: if the code needs to know it runs in a browser, it does not
   belong in `core/`. No `window`, no `document`, no `localStorage`, no React.
 - `src/lib/` holds the browser-specific adapters that `core/` consumes
-  (storage implementation, OAuth client wiring).
+  (storage implementation, OAuth client wiring, the TMDB proxy URL read from
+  `import.meta.env`). Nothing under `lib/` is imported by `core/` — it is
+  passed in.
+- Generated artifacts follow the same rule as hand-written ones: the lexicon
+  types and validators are platform-neutral, so they are generated into
+  `src/core/lexicon/` (0105), not into `lib/`.
 - `@/*` path alias configured in `tsconfig.json` and `vite.config.ts`.
 - Short `src/README.md` explaining the layout convention and the core
   boundary — including the test to apply when unsure where a file goes:
@@ -134,4 +157,5 @@ Scope out:
 - deciding what actually gets persisted (session, cache) — that arrives with
   Phase 1.
 Acceptance criteria:
-- no `localStorage` reference anywhere under `src/core/`.
+- no `localStorage` reference anywhere under `src/core/` — and it cannot be
+  reintroduced, since 0002 makes it a lint *and* typecheck failure.

@@ -38,11 +38,14 @@ Scope in:
 - List refreshes.
 Scope out: soft-delete / undo (post-V1).
 
-### 0305 — Free-text personal notes
+### 0305 — Free-text personal note
 Depends on: 0301
-Goal: user can write and edit notes on an entry.
+Goal: user can write and edit a note on an entry.
 Scope in:
-- Textarea on the detail page.
+- Textarea on the detail page, writing the `note` field from 0102.
+- A "this note contains spoilers" checkbox writing the `spoiler` flag. It is
+  the only spoiler signal the feed engine (0604) gets that the progression
+  comparison cannot infer, so it ships with the note, not later.
 - Autosave on blur or a Save button (decide during implementation).
 - Reasonable length cap enforced.
 
