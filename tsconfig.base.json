@@ -1,0 +1,14 @@
+{
+  /* Shared by every project in this repo (app, node, and the DOM-free
+     tsconfig.core.json arriving with 0002). The root tsconfig.json only
+     holds references, so it cannot carry compilerOptions — anything all
+     projects must agree on goes here instead.
+
+     Paths are resolved relative to the file that declares them, so this
+     file has to sit next to src/. */
+  "compilerOptions": {
+    "paths": {
+      "@/*": ["./src/*"]
+    }
+  }
+}
