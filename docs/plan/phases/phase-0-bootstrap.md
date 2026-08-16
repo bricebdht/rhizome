@@ -99,10 +99,15 @@ Scope in:
 - Generated artifacts follow the same rule as hand-written ones: the lexicon
   types and validators are platform-neutral, so they are generated into
   `src/core/lexicon/` (0105), not into `lib/`.
-- `@/*` path alias configured in `tsconfig.app.json` (the Vite template uses
-  project references, so the root `tsconfig.json` holds no `compilerOptions`)
-  and in `vite.config.ts`. Both are required — one for the typechecker, one
-  for the bundler.
+- `@/*` path alias configured in `tsconfig.base.json` and in
+  `vite.config.ts`. Both are required — one for the typechecker, one for the
+  bundler.
+  The Vite template uses project references, so the root `tsconfig.json`
+  holds no `compilerOptions` and cannot carry the mapping. It goes in a
+  shared `tsconfig.base.json` that every project extends, **not** in
+  `tsconfig.app.json`: `tsconfig.core.json` (0002) must inherit the same
+  `paths`, or `@/core/...` imports would resolve for the app and Vite while
+  failing the DOM-free core typecheck.
 - Short `src/README.md` explaining the layout convention and the core
   boundary — including the test to apply when unsure where a file goes:
   *would this make sense inside a UI-less npm package?*

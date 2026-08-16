@@ -65,9 +65,15 @@ import { isSpoiler } from '@/core/progress/spoiler'
 ```
 
 The alias is declared twice, and both are required: `paths` in
-`tsconfig.app.json` for the typechecker, `resolve.alias` in `vite.config.ts`
+`tsconfig.base.json` for the typechecker, `resolve.alias` in `vite.config.ts`
 for the bundler. Changing one without the other produces a build that
 typechecks and does not run, or the reverse.
+
+It sits in `tsconfig.base.json` rather than in `tsconfig.app.json`
+specifically so that **every** TS project inherits it — including the
+DOM-free `tsconfig.core.json` from 0002. Declaring it only on the app
+project would let `@/core/...` imports resolve for the app and Vite while
+failing the core typecheck, which is the one check the boundary depends on.
 
 See [`docs/plan/roadmap.md`](../docs/plan/roadmap.md) for why this boundary
 exists at all.
