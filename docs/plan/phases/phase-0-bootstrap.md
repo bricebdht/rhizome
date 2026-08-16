@@ -19,7 +19,7 @@ Acceptance criteria:
 Notes: keep the default Vite template files trimmed to the minimum.
 
 ### 0002 — Configure ESLint, Prettier, strict TS
-Depends on: 0001
+Depends on: 0001, 0005
 Goal: enforce a consistent code style and strict typing from day one.
 Scope in:
 - ESLint config (typescript-eslint recommended + react + hooks).
@@ -99,12 +99,17 @@ Scope in:
 - Generated artifacts follow the same rule as hand-written ones: the lexicon
   types and validators are platform-neutral, so they are generated into
   `src/core/lexicon/` (0105), not into `lib/`.
-- `@/*` path alias configured in `tsconfig.json` and `vite.config.ts`.
+- `@/*` path alias configured in `tsconfig.app.json` (the Vite template uses
+  project references, so the root `tsconfig.json` holds no `compilerOptions`)
+  and in `vite.config.ts`. Both are required — one for the typechecker, one
+  for the bundler.
 - Short `src/README.md` explaining the layout convention and the core
   boundary — including the test to apply when unsure where a file goes:
   *would this make sense inside a UI-less npm package?*
 Scope out:
-- creating empty folders for features that don't exist yet.
+- creating empty folders for features that don't exist yet. The layout is
+  documented in `src/README.md`; directories appear when a ticket puts
+  something in them (git does not track empty ones anyway).
 - extracting `core/` into a real package or monorepo workspace. It is a
   folder plus a lint rule; that is enough for V1.
 Notes: the boundary is enforced by the ESLint rules in 0002, not by

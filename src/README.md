@@ -1,0 +1,73 @@
+# `src/` layout
+
+Two questions decide where a file goes:
+
+1. **Does it need to know it runs in a browser?** If yes, it cannot live in
+   `core/`.
+2. **Would this make sense inside a UI-less npm package?** If yes, it
+   probably belongs in `core/`.
+
+## The layers
+
+| Folder | What lives here | Survives a React Native port? |
+| --- | --- | --- |
+| `app/` | app shell: root component, routing, providers | no |
+| `components/` | reusable presentational components (shadcn/ui lives here) | no |
+| `features/` | one folder per feature: its UI, hooks, and glue | no |
+| `state/` | Zustand slices | no |
+| `lib/` | **browser-specific adapters** — the implementations `core/` is handed | no, but it is small and deliberate |
+| `core/` | **platform-agnostic domain code** | **yes — this is the point** |
+| `types/` | shared ambient / cross-cutting types | n/a |
+
+Folders are created when something goes in them, not up front.
+
+## `core/` — the part that has to survive
+
+Planned contents, each arriving with its ticket:
+
+- `atproto/` — record CRUD, agent wiring, DID resolution. **Not** the OAuth
+  client (0106): that is redirects, WebCrypto and IndexedDB, so it lives in
+  `lib/`.
+- `lexicon/` — types and validation, including the generated artifacts from
+  0105.
+- `tmdb/` — the typed client (0205), built from an injected config object.
+- `progress/` — progression comparison and the anti-spoiler engine (0604).
+- `storage/` — the async `Storage` **interface** only (0009).
+
+Rules, in one line each:
+
+- No `window`, no `document`, no `localStorage`, no `navigator`.
+- No React, no components, no Zustand.
+- No `import.meta.env` — configuration is passed in, not read.
+- **`core/` never imports from `lib/`.** The direction is one-way: the app
+  builds the browser adapter and hands it to the core. Inverting this is the
+  single easiest way to void the whole exercise, which is why it is a lint
+  error and not a convention.
+
+Two clarifications worth keeping in mind, because they are easy to get wrong:
+
+- `core/` is **not** a backend. It ships to the device in the same bundle as
+  the UI and can hold no secret — that is exactly why the TMDB key needs a
+  proxy. Think library, not tier.
+- Validation in `core/lexicon/` is **UX, not security**. The user's PDS is
+  the only authority, and a user can write to their own repo without going
+  through this app.
+
+The boundary is enforced by the ESLint rules and the DOM-free
+`tsconfig.core.json` in ticket 0002 — not by good intentions.
+
+## Imports
+
+Use the `@/*` alias, never `../../..`:
+
+```ts
+import { isSpoiler } from '@/core/progress/spoiler'
+```
+
+The alias is declared twice, and both are required: `paths` in
+`tsconfig.app.json` for the typechecker, `resolve.alias` in `vite.config.ts`
+for the bundler. Changing one without the other produces a build that
+typechecks and does not run, or the reverse.
+
+See [`docs/plan/roadmap.md`](../docs/plan/roadmap.md) for why this boundary
+exists at all.
