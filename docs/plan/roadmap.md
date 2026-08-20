@@ -22,8 +22,12 @@ rewrite.
   differently per media type (season/episode for series, boolean for films,
   percent/hours for games, page/chapter for books). The anti-spoiler engine
   compares two `progress` values regardless of media type.
-- **Metadata source: TMDB for V1.** External IDs only in the AT records; no
-  duplication of TMDB metadata into user repos.
+- **Metadata source: TMDB for V1**, pending the explicit comparison in ticket
+  0200 — keyless alternatives exist (TVmaze covers series with no key at all;
+  Cinemeta covers both but is undocumented infrastructure), and one of them
+  could remove the proxy from part of the app. External IDs only in the AT
+  records; no duplication of metadata into user repos, which is also what
+  keeps a source change from being a migration.
 - **Identity: reuse the public Bluesky PLC directory** to resolve DIDs.
   Self-hosting a PLC is a future option, not V1.
 - **Auth: AT Protocol OAuth, no app passwords** (ticket 0106). Rhizome never
