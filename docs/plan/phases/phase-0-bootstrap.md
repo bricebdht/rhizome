@@ -179,8 +179,14 @@ Depends on: 0002
 Goal: every push and PR runs lint + typecheck + build.
 Scope in:
 
-- Single workflow: install → lint → typecheck → build.
-- Node LTS, npm cache.
+- Single workflow: install → lint → format check → typecheck → build.
+  `format:check` is included even though the ticket did not list it: a
+  formatter nobody verifies is a suggestion, and it is one line here.
+- Runs on pushes to `main` and on every pull request.
+- Node LTS, npm cache, `npm ci` (not `npm install`) so the lockfile is
+  authoritative and a drifted `package.json` fails loudly.
+- Steps kept separate rather than `&&`-chained, so a failure names itself.
+- Concurrency group cancelling superseded runs on the same ref.
 
 Scope out: tests (no test suite yet), deploy pipeline.
 
