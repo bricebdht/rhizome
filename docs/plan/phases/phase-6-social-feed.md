@@ -7,27 +7,33 @@ that same media.
 ---
 
 ### 0601 — Design note: aggregation strategy
+
 Depends on: 0108
 Goal: written comparison of the two viable approaches for V1.
 Scope in:
+
 - Option A — pull from follows client-side: for each account the user follows on Bluesky, call `listRecords` on `app.rhizome.media.entry`. Simple, no infra, latency proportional to follow count.
 - Option B — custom AppView / firehose consumer: a small backend subscribes to the relay, indexes Rhizome records, exposes a feed API. More infra, better scaling.
 - File: `docs/architecture/feed-aggregation.md`.
-Scope out: implementing either option (0602 decides, 0603 builds).
+  Scope out: implementing either option (0602 decides, 0603 builds).
 
 ### 0602 — Decision: V1 aggregation strategy
+
 Depends on: 0601
 Goal: pick A or B for V1 and log the reasoning.
 Scope in:
+
 - Decision recorded at the top of `docs/architecture/feed-aggregation.md`.
 - If A: document the follow-count ceiling at which it stops being viable.
 - If B: define the smallest possible service and defer to phase 2.
 - Default expectation: **A for V1** (matches "cost close to zero" goal), B parked as follow-up.
 
 ### 0603 — Fetch recent media records from followed accounts
+
 Depends on: 0602
 Goal: given the logged-in user, return a chronologically merged list of recent media entries from accounts they follow on Bluesky.
 Scope in:
+
 - Read the user's follow list (via `app.bsky.graph.getFollows`).
 - For each follow, fetch recent `app.rhizome.media.entry` records (paginated, capped).
 - Merge and sort by `updatedAt` desc, falling back to `createdAt` when a
@@ -38,13 +44,15 @@ Scope in:
   value to their own repo). Clamp anything in the future to "now" for
   ordering purposes rather than letting one record pin itself to the top.
 - Cache results in memory for the session.
-Scope out: real-time updates (post-V1).
+  Scope out: real-time updates (post-V1).
 
 ### 0604 — Anti-spoiler rule engine
+
 Depends on: 0102, 0103, 0405
 Goal: a pure function that, given the viewer's progression and a feed entry,
 decides what of that entry is safe to show.
 Scope in:
+
 - `isSpoiler(viewerProgress, entry)` where `entry` is the poster's media
   entry — `{ mediaType, progress, note?, spoiler? }`. Passing the whole
   entry rather than two bare progress values is the point: the same
@@ -54,7 +62,7 @@ Scope in:
 - Returns a decision, not a boolean:
   `{ progress: "show" | "hide", note: "show" | "hide" | "absent" }`.
   The UI needs the two separately — 0605 blurs a note while still showing
-  that someone watched *something*.
+  that someone watched _something_.
 - Rules:
   - `spoiler === true` (author flagged their own note) → note hidden,
     whatever the progressions say. Cheapest signal available and the author
@@ -73,7 +81,7 @@ Scope in:
   including the "viewer has no entry" and fail-closed paths.
 - Documented in `docs/architecture/anti-spoiler.md`, including the model this
   borrows from TV Time: users declare what they have seen, and discussion is
-  anchored to the episode it concerns, so *where* a comment lives already
+  anchored to the episode it concerns, so _where_ a comment lives already
   carries most of the spoiler information. Note there what V1 does not have
   yet, and why:
   - **Per-episode comment threads.** In V1 a note hangs off the media entry,
@@ -89,9 +97,11 @@ Scope in:
     reader-supplied flag drops into the same decision later.
 
 ### 0605 — Feed UI with blurred spoilers
+
 Depends on: 0603, 0604
 Goal: render the feed with spoiler content blurred/hidden by default.
 Scope in:
+
 - Feed page listing recent entries from follows.
 - For each entry, resolve the viewer's own progression on the same media (from their own list).
 - Apply the decision from 0604 field by field: hidden progression collapses
@@ -101,8 +111,10 @@ Scope in:
   "Spoiler for S03E05" to a viewer who is on S02.
 
 ### 0606 — Reveal spoiler action
+
 Depends on: 0605
 Goal: user can explicitly reveal a hidden item.
 Scope in:
+
 - Click-to-reveal on individual items.
 - Session-scoped: reveals are not persisted across reloads (post-V1).

@@ -1,0 +1,27 @@
+{
+  /* The core boundary, enforced by the typechecker rather than by lint.
+     ESLint rules can be silenced with an inline comment; a missing DOM lib
+     cannot. If a module under src/core reaches for `document`, `window` or
+     `localStorage`, this project stops compiling.
+
+     `types: []` is the other half: without it, @types/node and vite/client
+     would leak browser and Node globals back in through the ambient types. */
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.core.tsbuildinfo",
+    "target": "es2023",
+    "lib": ["ES2023"],
+    "types": [],
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "moduleDetection": "force",
+    "verbatimModuleSyntax": true,
+    "erasableSyntaxOnly": true,
+    "noEmit": true,
+    "skipLibCheck": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true
+  },
+  "include": ["src/core"]
+}
