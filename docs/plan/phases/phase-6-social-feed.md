@@ -15,7 +15,8 @@ Scope in:
 - Option A — pull from follows client-side: for each account the user follows on Bluesky, call `listRecords` on `app.rhizome.media.entry`. Simple, no infra, latency proportional to follow count.
 - Option B — custom AppView / firehose consumer: a small backend subscribes to the relay, indexes Rhizome records, exposes a feed API. More infra, better scaling.
 - File: `docs/architecture/feed-aggregation.md`.
-  Scope out: implementing either option (0602 decides, 0603 builds).
+
+Scope out: implementing either option (0602 decides, 0603 builds).
 
 ### 0602 — Decision: V1 aggregation strategy
 
@@ -44,7 +45,8 @@ Scope in:
   value to their own repo). Clamp anything in the future to "now" for
   ordering purposes rather than letting one record pin itself to the top.
 - Cache results in memory for the session.
-  Scope out: real-time updates (post-V1).
+
+Scope out: real-time updates (post-V1).
 
 ### 0604 — Anti-spoiler rule engine
 

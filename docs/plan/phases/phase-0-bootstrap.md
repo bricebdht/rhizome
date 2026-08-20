@@ -14,11 +14,15 @@ Scope in:
 - `npm create vite@latest` with the `react-ts` template, cleaned up.
 - `package.json` scripts: `dev`, `build`, `preview`.
 - App renders a placeholder page.
-  Scope out: any styling framework, any state library, any router.
-  Acceptance criteria:
+
+Scope out: any styling framework, any state library, any router.
+
+Acceptance criteria:
+
 - `npm install && npm run dev` starts the app on localhost.
 - `npm run build` succeeds.
-  Notes: keep the default Vite template files trimmed to the minimum.
+
+Notes: keep the default Vite template files trimmed to the minimum.
 
 ### 0002 — Configure ESLint, Prettier, strict TS
 
@@ -63,11 +67,15 @@ Scope in:
   what makes the guarantee structural rather than a lint rule someone can
   disable inline: a `document` reference stops typechecking, it does not
   merely warn. `npm run typecheck` runs both projects.
-  Scope out:
+
+Scope out:
+
 - pre-commit hooks (nice-to-have, later).
 - enforcing anything about `src/lib/` itself — it is allowed to be as
   browser-specific as it likes. That is its job.
-  Acceptance criteria:
+
+Acceptance criteria:
+
 - all three scripts pass on the scaffolded project.
 - each of these, added deliberately inside `src/core/`, fails the checks:
   - `import { useState } from 'react'` → fails `npm run lint`.
@@ -89,8 +97,10 @@ Scope in:
 - Tailwind installed and wired to Vite.
 - shadcn/ui initialized; `Button` and `Card` added as smoke test.
 - Global CSS reset applied.
-  Scope out: any theming, dark mode toggle (Phase 5).
-  Acceptance criteria: a demo page shows a shadcn `Button` and `Card` styled correctly.
+
+Scope out: any theming, dark mode toggle (Phase 5).
+
+Acceptance criteria: a demo page shows a shadcn `Button` and `Card` styled correctly.
 
 ### 0004 — Zustand store skeleton
 
@@ -101,7 +111,8 @@ Scope in:
 - Zustand installed.
 - One example slice (e.g. `useUiStore`) to demonstrate the pattern.
 - Convention documented in `src/state/README.md` (one slice per file, hook naming).
-  Scope out: any real state (auth, list, feed) — created with their features.
+
+Scope out: any real state (auth, list, feed) — created with their features.
 
 ### 0005 — Folder structure & path aliases
 
@@ -137,14 +148,17 @@ Scope in:
 - Short `src/README.md` explaining the layout convention and the core
   boundary — including the test to apply when unsure where a file goes:
   _would this make sense inside a UI-less npm package?_
-  Scope out:
+
+Scope out:
+
 - creating empty folders for features that don't exist yet. The layout is
   documented in `src/README.md`; directories appear when a ticket puts
   something in them (git does not track empty ones anyway).
 - extracting `core/` into a real package or monorepo workspace. It is a
   folder plus a lint rule; that is enough for V1.
-  Notes: the boundary is enforced by the ESLint rules in 0002, not by
-  convention alone.
+
+Notes: the boundary is enforced by the ESLint rules in 0002, not by
+convention alone.
 
 ### 0006 — Initial README
 
@@ -156,7 +170,8 @@ Scope in:
 - Stack summary.
 - Link to `docs/plan/README.md`.
 - "Status: early WIP" banner.
-  Scope out: screenshots, install instructions, contribution guide (Phase 7).
+
+Scope out: screenshots, install instructions, contribution guide (Phase 7).
 
 ### 0007 — GitHub Actions CI
 
@@ -166,8 +181,10 @@ Scope in:
 
 - Single workflow: install → lint → typecheck → build.
 - Node LTS, npm cache.
-  Scope out: tests (no test suite yet), deploy pipeline.
-  Acceptance criteria: workflow green on `main` after the first push.
+
+Scope out: tests (no test suite yet), deploy pipeline.
+
+Acceptance criteria: workflow green on `main` after the first push.
 
 ### 0008 — Environment variables strategy
 
@@ -178,7 +195,8 @@ Scope in:
 - `.env.example` listing all required vars with placeholder values.
 - Documented in the README: which are public (`VITE_*`) vs proxy-side only.
 - `.env` and `.env.local` in `.gitignore` (verify).
-  Scope out: actually setting real values (proxy phase).
+
+Scope out: actually setting real values (proxy phase).
 
 ### 0009 — Storage adapter behind an async interface
 
@@ -194,12 +212,16 @@ Scope in:
 - Web implementation in `src/lib/storage/web.ts` wrapping `localStorage`.
 - Core modules receive a `Storage` — they never import an implementation.
 - An in-memory implementation for tests.
-  Scope out:
+
+Scope out:
+
 - the same treatment for `fetch`, navigation, or anything else. One adapter,
   chosen because its cost of non-decision is asymmetric. Others come when a
   concrete need appears, not before.
 - deciding what actually gets persisted (session, cache) — that arrives with
   Phase 1.
-  Acceptance criteria:
+
+Acceptance criteria:
+
 - no `localStorage` reference anywhere under `src/core/` — and it cannot be
   reintroduced, since 0002 makes it a lint _and_ typecheck failure.

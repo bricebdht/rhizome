@@ -18,7 +18,8 @@ Scope in:
   redirect → callback → DPoP-bound session) → write a media record → read
   another user's records.
 - File: `docs/architecture/atproto.md`.
-  Scope out: any code.
+
+Scope out: any code.
 
 ### 0102 — Draft lexicon: media entry (film / series)
 
@@ -40,9 +41,11 @@ Scope in:
   comment threads described in `docs/architecture/anti-spoiler.md` are a
   post-V1 collection, not a field on this record.
 - JSON Schema draft in the phase doc; not yet committed to `lexicons/`.
-  Scope out: publishing the lexicon file (0104), TS types (0105).
-  Acceptance criteria: sample record for a film and one for a series both
-  validate against the schema on paper.
+
+Scope out: publishing the lexicon file (0104), TS types (0105).
+
+Acceptance criteria: sample record for a film and one for a series both
+validate against the schema on paper.
 
 ### 0103 — Draft lexicon: generic `progress` object
 
@@ -57,7 +60,8 @@ Scope in:
   - (documented but not implemented) `game`: `{ kind: "game", percentComplete?: number, hoursPlayed?: number }`
   - (documented but not implemented) `book`: `{ kind: "book", currentPage?: number, totalPages?: number, chapter?: string }`
 - Rationale for the discriminant vs a flat schema.
-  Scope out: the anti-spoiler comparator (Phase 6).
+
+Scope out: the anti-spoiler comparator (Phase 6).
 
 ### 0104 — Publish lexicon JSON files
 
@@ -67,7 +71,8 @@ Scope in:
 
 - `lexicons/app/rhizome/media/entry.json` etc., following atproto conventions.
 - `lexicons/README.md` explaining the layout.
-  Scope out: hosting them at a resolvable URL.
+
+Scope out: hosting them at a resolvable URL.
 
 ### 0105 — Generate TypeScript types from lexicon
 
@@ -85,7 +90,8 @@ Scope in:
 - The generated directory is exempt from formatting/lint noise but **not**
   from the core boundary rules — if the generator emits a browser global,
   that is a problem to solve now, not to whitelist.
-  Scope out: runtime validation (uses the generated validators).
+
+Scope out: runtime validation (uses the generated validators).
 
 ### 0106 — OAuth login (browser)
 
@@ -108,14 +114,18 @@ Scope in:
 - `core/` never sees the OAuth client. It is handed an already-authenticated
   agent (or a narrow `AtprotoSession` interface exposing `did` + a fetch
   handler) — the same injection shape as the storage adapter in 0009.
-  Scope out:
+
+Scope out:
+
 - App passwords. They were the earlier plan and are dropped: the whole
   web-first rationale in `roadmap.md` is that browser OAuth is the cheap
   path, and shipping a "paste your app password here" form contradicts the
   one decision this phase exists to establish.
 - Native / deep-link OAuth (that is the port, not V1).
 - Multi-account switching (post-V1).
-  Acceptance criteria:
+
+Acceptance criteria:
+
 - logging in never asks for a password on a Rhizome-served page; the
   credential prompt is on the user's own PDS.
 - after the callback, the app shows the user's handle and DID.
@@ -134,7 +144,8 @@ Scope in:
 - Anything Rhizome persists _itself_ (last active DID, UI prefs) goes through
   the `Storage` adapter from 0009, never `localStorage` directly.
 - Logout revokes the session through the client and clears the auth slice.
-  Scope out: multi-account switching (post-V1).
+
+Scope out: multi-account switching (post-V1).
 
 ### 0108 — Client wrapper for record CRUD
 
@@ -150,4 +161,5 @@ Scope in:
 - Writes set `createdAt` on create and `updatedAt` on every write (0102).
 - All input/output typed with the generated lexicon types.
 - Errors normalized to a small `AtprotoError` type.
-  Scope out: caching, optimistic updates (feature layer).
+
+Scope out: caching, optimistic updates (feature layer).
