@@ -201,8 +201,15 @@ Scope in:
 - `.env.example` listing all required vars with placeholder values.
 - Documented in the README: which are public (`VITE_*`) vs proxy-side only.
 - `.env` and `.env.local` in `.gitignore` (verify).
+- Proxy-side variables listed in `.env.example` as well, even though the app
+  never reads them — one visible configuration surface beats two dashboards.
 
 Scope out: actually setting real values (proxy phase).
+
+Acceptance criteria:
+
+- `git check-ignore` confirms `.env`, `.env.local` and `.env.production` are
+  ignored while `.env.example` is not.
 
 ### 0009 — Storage adapter behind an async interface
 
