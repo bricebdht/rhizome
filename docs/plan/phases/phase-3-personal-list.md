@@ -44,7 +44,8 @@ Scope in:
 
 - Delete action with a confirmation.
 - List refreshes.
-  Scope out: soft-delete / undo (post-V1).
+
+Scope out: soft-delete / undo (post-V1).
 
 ### 0305 — Free-text personal note
 

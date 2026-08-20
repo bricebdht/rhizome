@@ -14,7 +14,8 @@ Scope in:
 - Create a TMDB developer account, request an API key (v3 auth).
 - Note in `docs/architecture/tmdb.md`: attribution string, terms of use for non-commercial projects, rate limits.
 - Keep the key out of the repo; store it wherever the proxy is deployed.
-  Scope out: any code.
+
+Scope out: any code.
 
 ### 0202 — Design the serverless proxy
 
@@ -28,7 +29,8 @@ Scope in:
 - CORS origin allowlist strategy.
 - Rate limiting per IP (rough plan).
 - Written up in `docs/architecture/tmdb.md`.
-  Scope out: implementation (0203-0204).
+
+Scope out: implementation (0203-0204).
 
 ### 0203 — Proxy endpoint: search
 
@@ -69,8 +71,11 @@ Scope in:
   port replaces that one file.
 - `fetch` is injected too, defaulting to the global — it keeps tests from
   needing a network stub and costs one parameter.
-  Scope out: React Query / SWR wiring (added when a feature needs it).
-  Acceptance criteria:
+
+Scope out: React Query / SWR wiring (added when a feature needs it).
+
+Acceptance criteria:
+
 - `grep -r "import.meta" src/core/` returns nothing.
 
 ### 0206 — Attribution notice in the UI

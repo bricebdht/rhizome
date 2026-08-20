@@ -96,11 +96,25 @@ shape:
 
 Depends on: NNNN, NNNN
 Goal: one sentence.
-Scope in: bullets — what this ticket delivers.
-Scope out: bullets — what this ticket explicitly does NOT deliver.
-Acceptance criteria: bullets — how we know it's done.
+Scope in:
+
+- bullets — what this ticket delivers.
+
+Scope out:
+
+- bullets — what this ticket explicitly does NOT deliver.
+
+Acceptance criteria:
+
+- bullets — how we know it's done.
+
 Notes: open questions, links, decisions taken during work.
 ```
+
+A label that follows a bullet list needs a blank line before it. Without
+one, markdown reads it as a continuation of the last bullet and Prettier
+indents it accordingly — the label then renders inside the list instead of
+introducing the next section.
 
 Don't hand-tune the spacing: `npm run format` covers markdown too, so the
 shape is enforced rather than agreed. Run it before opening a PR.
