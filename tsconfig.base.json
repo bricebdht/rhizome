@@ -9,6 +9,12 @@
   "compilerOptions": {
     "paths": {
       "@/*": ["./src/*"]
-    }
+    },
+
+    /* Strictness, shared by every project. Cheaper to accept now than to
+       retrofit onto a codebase that grew without it. */
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "exactOptionalPropertyTypes": true
   }
 }

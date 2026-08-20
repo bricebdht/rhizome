@@ -22,8 +22,10 @@ Notes: keep the default Vite template files trimmed to the minimum.
 Depends on: 0001, 0005
 Goal: enforce a consistent code style and strict typing from day one.
 Scope in:
-- ESLint config (typescript-eslint recommended + react + hooks).
-- Prettier config; ESLint and Prettier don't fight.
+- ESLint config (typescript-eslint recommended + react + hooks), flat config.
+- Prettier config; ESLint and Prettier don't fight (`eslint-config-prettier`
+  last in the chain). Markdown is excluded — the ticket specs use a compact
+  shape Prettier reflows for no gain.
 - `tsconfig.json` with `strict: true`, `noUncheckedIndexedAccess`, `exactOptionalPropertyTypes`.
 - `npm run lint`, `npm run typecheck`, `npm run format` scripts.
 - **Layer boundary rules** enforcing that `src/core/` stays platform-agnostic
@@ -40,6 +42,12 @@ Scope in:
     `react-dom`, and the `@/app/*`, `@/components/*`, `@/features/*`,
     `@/state/*`, `@/lib/*` aliases (the alias form bypasses
     `no-restricted-paths`, so both rules are required).
+    Uses `eslint-plugin-import-x`, not `eslint-plugin-import`: the
+    `eslint-import-resolver-typescript` package pulls in the latter, which
+    peer-depends on ESLint ≤ 9 and cannot be installed alongside ESLint 10.
+    The rule needs `settings['import-x/resolver'].node.extensions` to include
+    `.ts`/`.tsx` — without it the resolver never finds an extensionless
+    `../lib/...` import and the rule passes silently.
   - `no-restricted-globals` scoped to `src/core/**` — bans `window`,
     `document`, `localStorage`, `sessionStorage`, `navigator`, `location`
     and `alert`. Without this the boundary is decorative.
@@ -56,7 +64,12 @@ Acceptance criteria:
 - all three scripts pass on the scaffolded project.
 - each of these, added deliberately inside `src/core/`, fails the checks:
   - `import { useState } from 'react'` → fails `npm run lint`.
-  - `import { webStorage } from '@/lib/storage/web'` → fails `npm run lint`.
+  - `import { createWebStorage } from '@/lib/storage/web'` → fails
+    `npm run lint`.
+  - the same import written relatively, `'../lib/storage/web'` → fails
+    `npm run lint`. Worth testing separately: it goes through a different
+    rule than the alias form, and it is the one that fails silently when the
+    resolver is misconfigured.
   - `localStorage.getItem('x')` → fails `npm run lint` **and**
     `npm run typecheck`.
 
