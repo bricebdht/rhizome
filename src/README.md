@@ -9,15 +9,15 @@ Two questions decide where a file goes:
 
 ## The layers
 
-| Folder | What lives here | Survives a React Native port? |
-| --- | --- | --- |
-| `app/` | app shell: root component, routing, providers | no |
-| `components/` | reusable presentational components (shadcn/ui lives here) | no |
-| `features/` | one folder per feature: its UI, hooks, and glue | no |
-| `state/` | Zustand slices | no |
-| `lib/` | **browser-specific adapters** — the implementations `core/` is handed | no, but it is small and deliberate |
-| `core/` | **platform-agnostic domain code** | **yes — this is the point** |
-| `types/` | shared ambient / cross-cutting types | n/a |
+| Folder        | What lives here                                                       | Survives a React Native port?      |
+| ------------- | --------------------------------------------------------------------- | ---------------------------------- |
+| `app/`        | app shell: root component, routing, providers                         | no                                 |
+| `components/` | reusable presentational components (shadcn/ui lives here)             | no                                 |
+| `features/`   | one folder per feature: its UI, hooks, and glue                       | no                                 |
+| `state/`      | Zustand slices                                                        | no                                 |
+| `lib/`        | **browser-specific adapters** — the implementations `core/` is handed | no, but it is small and deliberate |
+| `core/`       | **platform-agnostic domain code**                                     | **yes — this is the point**        |
+| `types/`      | shared ambient / cross-cutting types                                  | n/a                                |
 
 Folders are created when something goes in them, not up front.
 
@@ -28,8 +28,7 @@ Planned contents, each arriving with its ticket:
 - `atproto/` — record CRUD, agent wiring, DID resolution. **Not** the OAuth
   client (0106): that is redirects, WebCrypto and IndexedDB, so it lives in
   `lib/`.
-- `lexicon/` — types and validation, including the generated artifacts from
-  0105.
+- `lexicon/` — types and validation, including the generated artifacts from 0105.
 - `tmdb/` — the typed client (0205), built from an injected config object.
 - `progress/` — progression comparison and the anti-spoiler engine (0604).
 - `storage/` — the async `Storage` **interface** only (0009).

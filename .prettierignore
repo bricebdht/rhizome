@@ -1,9 +1,2 @@
 dist
 package-lock.json
-
-# Markdown is hand-wrapped prose here, and the ticket specs in docs/plan use a
-# deliberately compact shape (`Depends on:` directly under the heading, bullets
-# directly under `Scope in:`). Prettier inserts a blank line after every heading
-# and before every list, which reflows all of it for no gain. Code is what needs
-# a formatter; prose is reviewed by humans.
-*.md

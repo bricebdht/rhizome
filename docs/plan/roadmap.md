@@ -93,6 +93,7 @@ shape:
 
 ```
 ### NNNN — Title
+
 Depends on: NNNN, NNNN
 Goal: one sentence.
 Scope in: bullets — what this ticket delivers.
@@ -100,6 +101,9 @@ Scope out: bullets — what this ticket explicitly does NOT deliver.
 Acceptance criteria: bullets — how we know it's done.
 Notes: open questions, links, decisions taken during work.
 ```
+
+Don't hand-tune the spacing: `npm run format` covers markdown too, so the
+shape is enforced rather than agreed. Run it before opening a PR.
 
 These files hold the **spec only — never the status**. Status lives in GitHub
 Issues (one issue per ticket, titled `NNNN — Title`, grouped under a milestone

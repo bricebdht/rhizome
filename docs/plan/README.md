@@ -9,15 +9,15 @@ This directory is the **specification** for V1. Everything here is scoped to
 
 ## Where the status lives
 
-**Not here.** This directory says *what* each ticket is; **GitHub Issues** say
-*where it stands*. One source of truth for status, so nothing drifts.
+**Not here.** This directory says _what_ each ticket is; **GitHub Issues** say
+_where it stands_. One source of truth for status, so nothing drifts.
 
-| Question | Where to look |
-| --- | --- |
-| What does ticket 0103 actually cover? | `phases/phase-1-atproto.md` |
-| Is 0103 done / who's on it / what broke? | the GitHub issue titled `0103 — …` |
-| What's left in Phase 1? | the `Phase 1 — AT Protocol foundations` milestone |
-| What should I work on next? | open issues, filtered by the current milestone |
+| Question                                 | Where to look                                     |
+| ---------------------------------------- | ------------------------------------------------- |
+| What does ticket 0103 actually cover?    | `phases/phase-1-atproto.md`                       |
+| Is 0103 done / who's on it / what broke? | the GitHub issue titled `0103 — …`                |
+| What's left in Phase 1?                  | the `Phase 1 — AT Protocol foundations` milestone |
+| What should I work on next?              | open issues, filtered by the current milestone    |
 
 Ticket IDs (`NNNN`) are stable and appear in both places: the issue title
 starts with the ID and links back to the spec section.
@@ -53,19 +53,19 @@ that's the point of keeping it in the repo.
 5. Open the PR with `Closes #NN` in the description.
 
 Keep tickets small enough that a reviewer can read the diff in one sitting. If
-a ticket grows beyond that, split it — in the spec *and* in the issues.
+a ticket grows beyond that, split it — in the spec _and_ in the issues.
 
 ## Phases
 
-| # | Phase | Spec |
-| --- | --- | --- |
-| 0 | Bootstrap | [phase-0-bootstrap.md](phases/phase-0-bootstrap.md) |
-| 1 | AT Protocol foundations | [phase-1-atproto.md](phases/phase-1-atproto.md) |
-| 2 | TMDB integration | [phase-2-tmdb.md](phases/phase-2-tmdb.md) |
-| 3 | Personal list | [phase-3-personal-list.md](phases/phase-3-personal-list.md) |
-| 4 | Progression tracking | [phase-4-progression.md](phases/phase-4-progression.md) |
-| 5 | UI | [phase-5-ui.md](phases/phase-5-ui.md) |
-| 6 | Social feed with anti-spoiler logic | [phase-6-social-feed.md](phases/phase-6-social-feed.md) |
-| 7 | Polish & launch | [phase-7-polish-launch.md](phases/phase-7-polish-launch.md) |
+| #   | Phase                               | Spec                                                        |
+| --- | ----------------------------------- | ----------------------------------------------------------- |
+| 0   | Bootstrap                           | [phase-0-bootstrap.md](phases/phase-0-bootstrap.md)         |
+| 1   | AT Protocol foundations             | [phase-1-atproto.md](phases/phase-1-atproto.md)             |
+| 2   | TMDB integration                    | [phase-2-tmdb.md](phases/phase-2-tmdb.md)                   |
+| 3   | Personal list                       | [phase-3-personal-list.md](phases/phase-3-personal-list.md) |
+| 4   | Progression tracking                | [phase-4-progression.md](phases/phase-4-progression.md)     |
+| 5   | UI                                  | [phase-5-ui.md](phases/phase-5-ui.md)                       |
+| 6   | Social feed with anti-spoiler logic | [phase-6-social-feed.md](phases/phase-6-social-feed.md)     |
+| 7   | Polish & launch                     | [phase-7-polish-launch.md](phases/phase-7-polish-launch.md) |
 
 See [roadmap.md](roadmap.md) for why the phases are in this order.
