@@ -30,7 +30,7 @@ Planned contents, each arriving with its ticket:
   `lib/`.
 - `lexicon/` — types and validation, including the generated artifacts from 0105.
 - `tmdb/` — the typed client (0205), built from an injected config object.
-- `progress/` — progression comparison and the anti-spoiler engine (0604).
+- `progress/` — progression comparison and the anti-spoiler rules (0702, 0704).
 - `storage/` — the async `Storage` **interface** only (0009).
 
 Rules, in one line each:

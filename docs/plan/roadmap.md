@@ -4,7 +4,9 @@
 
 An open source, decentralized alternative to TV Time. User data lives in each
 user's own AT Protocol repository (their PDS), not in a central database.
-Cost-to-run should stay close to zero. The distinctive feature is a
+Cost-to-run should stay low — a few euros a month, not zero: episode threads
+need an index that no client-side query can replace (phase 6). The
+distinctive feature is a
 progression-aware social feed that hides spoilers based on where each viewer
 actually is in a show.
 
@@ -16,8 +18,9 @@ rewrite.
 
 - **Language: TypeScript everywhere for V1.** The official `@atproto` SDK is
   the most mature; adding a second language while learning the protocol would
-  add cognitive load for no clear gain. A Go firehose consumer or a light
-  custom AppView is a candidate for phase 2.
+  add cognitive load for no clear gain. The AppView stays TypeScript too:
+  Jetstream delivers plain JSON rather than CBOR/CAR, which removes the main
+  argument for writing a firehose consumer in Go.
 - **Schema changes are near-impossible after publication.** Records live in
   users' repos, which we cannot write to, so AT Protocol forbids breaking
   lexicon changes rather than offering a migration path: optional fields can
@@ -41,14 +44,33 @@ rewrite.
   sees a credential. The OAuth client is browser-specific and lives in
   `src/lib/atproto/oauth/`, outside the core boundary — a native port
   rewrites that file and keeps everything else.
-- **Backend: a small serverless proxy** only to hide TMDB (and later IGDB)
-  API keys and centralize rate limiting. Everything else runs client-side.
-- **Feed aggregation (V1): pull from Bluesky follows client-side.** A custom
-  AppView / firehose consumer is a phase-2 candidate once the core app is
-  usable.
-- **Anti-spoiler filtering happens client-side in V1**, because the
-  viewer's own progression is the input and the viewer is the one who needs
-  the filter applied.
+- **Two backend components, both deliberately small.** A serverless proxy
+  hiding the TMDB API key and centralizing rate limiting, and an **AppView**
+  indexing episode comments and spoiler flags (phase 6).
+  The AppView is an **index, never a source of truth**: writes go straight
+  from the client to the user's PDS, and wiping the index would lose nothing
+  a firehose replay cannot rebuild. The test to keep applying — _if we
+  deleted it, would any user lose data?_ — must stay answerable with "no".
+  Everything else runs client-side.
+- **Aggregation is decided per data type, not globally** (tickets 0601-0602):
+  - **Media entries** — pulled from follows client-side. The reader only ever
+    needs the accounts they follow, and direct repo reads keep working when
+    the AppView is down. Cost is one request per followed account, so this
+    degrades with follow count, not with anyone's popularity; the ceiling is
+    documented in 0701 and is the trigger for indexing entries later.
+  - **Episode comments and spoiler flags** — through the AppView. A thread
+    limited to accounts you follow is not a thread: empty for a new user, and
+    the point of episode discussion is that strangers are in it. No client-
+    side query can ask "who wrote about this episode?".
+- **Anti-spoiler = a progression gate plus reader flags.** You reach an
+  episode's discussion once you have marked that episode as seen; anything
+  spoilery inside it can be flagged by readers and renders blurred until
+  clicked. There is no cross-user progression comparison — anchoring
+  discussion to episodes already carries the information such a comparison
+  would reconstruct.
+  It runs client-side because the input is the viewer's own progression, and
+  it is a **courtesy layer, not access control**: comments are public records
+  readable straight from repos by anyone bypassing our UI.
 - **V1 is a web app, but the core stays platform-agnostic.** The likely
   end state is a mobile app; starting on the web is a deliberate first step,
   not a change of destination. Web first because AT Protocol OAuth is far
@@ -91,11 +113,15 @@ The order matters: each phase unlocks the next.
    case (season/episode); film is a special case of it.
 6. **UI polish** — until this phase the UI can stay ugly. This phase is
    where the app becomes pleasant to use.
-7. **Social feed with anti-spoiler** — the defining feature. It requires
-   everything above to be in place: identity, other users' records, a way to
-   compare progressions.
-8. **Polish & launch** — README, screenshots, launch post. Only meaningful
-   once phases 1-7 produce something worth showing.
+7. **AppView** — the index that makes network-wide episode threads possible.
+   It comes before the social feed because that feature cannot exist without
+   it, and because standing up an always-on service is its own kind of work:
+   deployment, cursor persistence, backfill, alerting.
+8. **Social feed, episode threads, anti-spoiler** — the defining feature. It
+   requires everything above: identity, other users' records, progression,
+   and the index.
+9. **Polish & launch** — README, screenshots, launch post. Only meaningful
+   once phases 1-8 produce something worth showing.
 
 ## Ticket-file conventions
 
@@ -141,7 +167,6 @@ sitting. If a ticket grows beyond that, split it.
 
 - Games (IGDB integration)
 - Books (Google Books / Open Library, manual progression)
-- Custom AppView / firehose consumer (Go)
 - Self-hosted PLC
 - i18n (V1 UI is English only)
 - Mobile-native app (V1 is a responsive web app; see the platform-agnostic
