@@ -24,8 +24,8 @@ starts with the ID and links back to the spec section.
 
 ## Conventions
 
-- **Milestone per phase** — `Phase 0 — Bootstrap` … `Phase 7 — Polish & launch`.
-- **Labels** — `phase-0` … `phase-7`, plus a type label:
+- **Milestone per phase** — `Phase 0 — Bootstrap` … `Phase 8 — Polish & launch`.
+- **Labels** — `phase-0` … `phase-8`, plus a type label:
   `type:feat`, `type:chore`, `type:doc`, `type:decision`.
 - **Issue title** — `NNNN — Title`, matching the spec heading verbatim.
 - **Issue body** — a link to the spec section, plus anything discovered during
@@ -34,7 +34,7 @@ starts with the ID and links back to the spec section.
 
 ## Issue creation is just-in-time
 
-Issues are **not** created for all 8 phases up front — the specs for the later
+Issues are **not** created for all 9 phases up front — the specs for the later
 phases will change once the earlier ones are built (especially after the
 lexicon work in Phase 1). Instead:
 
@@ -57,15 +57,16 @@ a ticket grows beyond that, split it — in the spec _and_ in the issues.
 
 ## Phases
 
-| #   | Phase                               | Spec                                                        |
-| --- | ----------------------------------- | ----------------------------------------------------------- |
-| 0   | Bootstrap                           | [phase-0-bootstrap.md](phases/phase-0-bootstrap.md)         |
-| 1   | AT Protocol foundations             | [phase-1-atproto.md](phases/phase-1-atproto.md)             |
-| 2   | TMDB integration                    | [phase-2-tmdb.md](phases/phase-2-tmdb.md)                   |
-| 3   | Personal list                       | [phase-3-personal-list.md](phases/phase-3-personal-list.md) |
-| 4   | Progression tracking                | [phase-4-progression.md](phases/phase-4-progression.md)     |
-| 5   | UI                                  | [phase-5-ui.md](phases/phase-5-ui.md)                       |
-| 6   | Social feed with anti-spoiler logic | [phase-6-social-feed.md](phases/phase-6-social-feed.md)     |
-| 7   | Polish & launch                     | [phase-7-polish-launch.md](phases/phase-7-polish-launch.md) |
+| #   | Phase                                      | Spec                                                        |
+| --- | ------------------------------------------ | ----------------------------------------------------------- |
+| 0   | Bootstrap                                  | [phase-0-bootstrap.md](phases/phase-0-bootstrap.md)         |
+| 1   | AT Protocol foundations                    | [phase-1-atproto.md](phases/phase-1-atproto.md)             |
+| 2   | TMDB integration                           | [phase-2-tmdb.md](phases/phase-2-tmdb.md)                   |
+| 3   | Personal list                              | [phase-3-personal-list.md](phases/phase-3-personal-list.md) |
+| 4   | Progression tracking                       | [phase-4-progression.md](phases/phase-4-progression.md)     |
+| 5   | UI                                         | [phase-5-ui.md](phases/phase-5-ui.md)                       |
+| 6   | AppView (episode thread index)             | [phase-6-appview.md](phases/phase-6-appview.md)             |
+| 7   | Social feed, episode threads, anti-spoiler | [phase-7-social-feed.md](phases/phase-7-social-feed.md)     |
+| 8   | Polish & launch                            | [phase-8-polish-launch.md](phases/phase-8-polish-launch.md) |
 
 See [roadmap.md](roadmap.md) for why the phases are in this order.

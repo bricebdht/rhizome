@@ -60,12 +60,12 @@ Scope in:
   namespace moves that point to a date we choose.
   Test records written under the experimental NSID are simply left behind in
   their own collection when we promote; nothing needs migrating.
-- Fields: `mediaType` (film|series), `externalRef` ({ source: "tmdb", id: string }), `status` (toWatch|watching|done|dropped), `progress` (see 0103), `rating` (optional number), `note` (optional string), `spoiler` (optional boolean — the author flagging their own note, see 0604), `createdAt`, `updatedAt` (optional), `startedAt` (optional), `finishedAt` (optional).
+- Fields: `mediaType` (film|series), `externalRef` ({ source: "tmdb", id: string }), `status` (toWatch|watching|done|dropped), `progress` (see 0103), `rating` (optional number), `note` (optional string), `spoiler` (optional boolean — the author flagging their own note, see 0704), `createdAt`, `updatedAt` (optional), `startedAt` (optional), `finishedAt` (optional).
 - `createdAt` is **required** and is a client-supplied ISO-8601 datetime, per
   atproto convention. Getting this right now is not optional rigour: a
   required field can never be added to a published lexicon, so this is the
   only window in which it can exist at all. AT Protocol records carry no server timestamp we can
-  sort on, so without this field the feed in 0603 has nothing to order by.
+  sort on, so without this field the feed in 0701 has nothing to order by.
   A record is rewritten on every progression update, so `createdAt` means
   "when this entry was added to the list"; `updatedAt` is what the feed
   actually sorts on and is refreshed on every write.
@@ -95,10 +95,57 @@ Scope in:
 
 Scope out: the anti-spoiler comparator (Phase 6).
 
+### 0109 — Draft lexicon: episode comment
+
+Depends on: 0102
+Goal: a record for one comment attached to one episode, so that discussion is
+anchored to the thing it concerns rather than to its author's progression.
+Scope in:
+
+- NSID under the experimental namespace, e.g.
+  `app.rhizome.experimental.episode.comment`.
+- Fields: `subject` ({ source, externalId, season, episode }), `text`,
+  `spoiler` (optional boolean — the author pre-flagging their own comment),
+  `createdAt` (required, same reasoning as 0102).
+- The anchor is the whole point: `(source, externalId, season, episode)` is
+  what the AppView indexes on (0604), and what makes the progression gate in
+  0702 possible without comparing users to each other.
+- Films have no season/episode. Decide and document: either both fields are
+  optional and absent for films, or films get `season: 0, episode: 0`. The
+  first is cleaner, the second makes the index key uniform — pick one and say
+  why.
+- Sample records for a series episode and for a film, validating on paper.
+
+Scope out: replies within a thread, editing, rich text, moderation.
+Notes: this collection is what makes per-episode threads possible. It was
+briefly parked as post-V1 while the anti-spoiler design compared
+progressions between users; anchoring discussion to episodes replaced that
+comparison entirely, and this record is the anchor.
+
+### 0110 — Draft lexicon: spoiler flag
+
+Depends on: 0109
+Goal: a record letting a reader mark someone else's comment as spoilery.
+Scope in:
+
+- NSID under the experimental namespace, e.g.
+  `app.rhizome.experimental.spoiler.flag`.
+- Fields: `subject` ({ uri, cid } — a strong reference to the flagged
+  comment), `createdAt` (required).
+- It has to be a separate record in the **flagger's own** repo, because there
+  is no way to add a field to a record you do not own. That constraint is why
+  flag counts need the AppView: knowing how many people flagged a comment
+  means aggregating records scattered across repos.
+- `cid` alongside `uri` pins the flag to the exact version of the comment
+  that was flagged, so editing a comment does not silently inherit flags
+  earned by different text.
+
+Scope out: unflagging, weighting by reputation, any moderation semantics.
+
 ### 0104 — Publish lexicon JSON files
 
-Depends on: 0102, 0103
-Goal: the lexicon lives at a stable path in the repo.
+Depends on: 0102, 0103, 0109, 0110
+Goal: the lexicons live at a stable path in the repo.
 Scope in:
 
 - `lexicons/app/rhizome/experimental/media/entry.json` etc., following

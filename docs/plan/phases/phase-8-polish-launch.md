@@ -1,14 +1,14 @@
-# Phase 7 — Polish & launch
+# Phase 8 — Polish & launch
 
-Only meaningful once Phases 1-6 produce something worth showing. Keep the
+Only meaningful once Phases 1-7 produce something worth showing. Keep the
 launch honest: an early WIP framed as "here's the technical journey", not a
 product pitch.
 
 ---
 
-### 0701 — Final README
+### 0801 — Final README
 
-Depends on: 0605
+Depends on: 0705
 Goal: someone landing on the repo can understand, install, and try Rhizome.
 Scope in:
 
@@ -19,9 +19,9 @@ Scope in:
 - Roadmap link.
 - Attribution (TMDB, Bluesky).
 
-### 0702 — CONTRIBUTING.md
+### 0802 — CONTRIBUTING.md
 
-Depends on: 0701
+Depends on: 0801
 Goal: lower the friction for outside contributors.
 Scope in:
 
@@ -30,9 +30,9 @@ Scope in:
 - PR expectations (small, scoped, one ticket per PR).
 - Code of conduct link.
 
-### 0703 — GitHub topics + description
+### 0803 — GitHub topics + description
 
-Depends on: 0701
+Depends on: 0801
 Goal: the repo is discoverable and its purpose is legible at a glance.
 Scope in:
 
@@ -40,9 +40,9 @@ Scope in:
 - Topics: `atproto`, `bluesky`, `decentralized`, `react`, `typescript`, `media-tracker`.
 - Social preview image (optional).
 
-### 0704 — Draft launch thread for Bluesky
+### 0804 — Draft launch thread for Bluesky
 
-Depends on: 0701
+Depends on: 0801
 Goal: a thread ready to post when we ship.
 Scope in:
 
@@ -50,7 +50,7 @@ Scope in:
 - Screenshots attached.
 - Stored in `docs/launch/bluesky-thread.md` (draft, not posted from the repo).
 
-### 0705 — Issue templates
+### 0805 — Issue templates
 
 Depends on: —
 Goal: incoming issues are structured.

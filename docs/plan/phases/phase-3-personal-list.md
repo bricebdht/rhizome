@@ -55,7 +55,7 @@ Scope in:
 
 - Textarea on the detail page, writing the `note` field from 0102.
 - A "this note contains spoilers" checkbox writing the `spoiler` flag. It is
-  the only spoiler signal the feed engine (0604) gets that the progression
+  the only spoiler signal the spoiler rules (0704) gets that the progression
   comparison cannot infer, so it ships with the note, not later.
 - Autosave on blur or a Save button (decide during implementation).
 - Reasonable length cap enforced.
