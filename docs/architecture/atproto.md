@@ -46,19 +46,39 @@ We delegate almost everything:
   is a post-V1 option.
 - **Storage and auth** — the user's PDS. It stores the repo, authenticates
   the user, and issues tokens. Most of our users' PDSes will be Bluesky's.
-- **Aggregation** — none in V1. The feed reads follows from Bluesky's
-  AppView and then queries each followed repo directly (0603).
+- **Aggregation of media entries** — none. The follows feed reads the follow
+  list from Bluesky's AppView, then queries each followed repo directly
+  (0701). Kept that way on purpose: it survives our own infrastructure being
+  down.
 
-We implement three things:
+We implement four things:
 
-- **A lexicon** describing our records (`lexicons/`).
+- **Lexicons** describing our records (`lexicons/`) — media entries, episode
+  comments, spoiler flags.
 - **A client** that reads and writes them (`src/core/atproto/`).
 - **Anti-spoiler logic** applied at read time, in the reader's browser
   (`src/core/progress/`).
+- **An AppView** (phase 6) indexing episode comments and spoiler flags,
+  because showing every comment on one episode needs records scattered
+  across thousands of repos and no client-side query can ask _"who wrote
+  about this episode?"_.
 
-There is no Rhizome server. The only backend component in the whole project
-is a TMDB proxy, which exists solely because an API key cannot ship in a
-browser — and even that is under review (ticket 0200).
+So there are two backend components, both small and both deliberate:
+
+|                | Why it exists                                                   | What breaks without it |
+| -------------- | --------------------------------------------------------------- | ---------------------- |
+| **TMDB proxy** | an API key cannot ship in a browser (under review, ticket 0200) | search and metadata    |
+| **AppView**    | network-wide episode threads are unanswerable client-side       | episode threads only   |
+
+**Neither is a source of truth.** Writes always go from the client straight
+to the user's PDS; the AppView only ever reads, and learns about new records
+from the firehose like anyone else. The test to keep applying: _if we
+deleted it, would any user lose data?_ The answer must stay no — the index
+is rebuilt by replaying the firehose.
+
+That is also why the follows feed does not route through it (0602, 0607). An
+outage should cost episode threads and nothing else. If the app stops working
+without our server, we have rebuilt a centralized product with extra steps.
 
 ## Flow 1 — Login (OAuth)
 
@@ -155,8 +175,11 @@ Rhizome (browser)          Bluesky AppView         each followed PDS
       |   records                                          |
       |<--------------------------------------------------|
       |
-      | merge, sort by updatedAt, then apply isSpoiler()
-      | against the reader's own progression
+      | merge and sort by updatedAt
+      |
+      | (no spoiler filtering here: discussion lives in
+      |  episode threads, gated by the reader's own
+      |  progression — see docs/architecture/anti-spoiler.md)
 ```
 
 ## Records are public
@@ -167,10 +190,13 @@ is the design.
 
 Two consequences we should never lose sight of:
 
-- **The anti-spoiler filter is a courtesy, not access control.** It runs in
-  the reader's browser over data anyone can fetch in the clear. It protects
-  people who want to be protected; it stops nobody determined to spoil
-  themselves or others.
+- **The anti-spoiler design is a courtesy, not access control.** It has two
+  mechanisms: you reach an episode's discussion once you have marked that
+  episode as seen, and readers can flag a comment so it renders blurred until
+  clicked. Both run in the reader's browser, over records anyone can fetch in
+  the clear. They protect people who want protecting; they stop nobody
+  determined. In particular, "you get access after marking it seen" is a gate
+  in _our interface_ — the comments are public records either way.
 - **Deletion is best-effort.** Removing a record takes it out of the repo,
   but it has already been announced on the firehose and may live on in other
   people's indexes.
