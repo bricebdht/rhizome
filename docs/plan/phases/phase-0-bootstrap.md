@@ -110,9 +110,17 @@ Scope in:
 
 - Zustand installed.
 - One example slice (e.g. `useUiStore`) to demonstrate the pattern.
-- Convention documented in `src/state/README.md` (one slice per file, hook naming).
+- Convention documented in `src/state/README.md` (one slice per file, hook
+  naming, and selecting narrowly rather than subscribing to the whole store).
+- Two boundaries written down while they are cheap to state: PDS records are
+  not mirrored into a slice, and `core/` never reads from `state/`.
 
 Scope out: any real state (auth, list, feed) — created with their features.
+
+Acceptance criteria:
+
+- an import of `@/state/*` or of `zustand` from inside `src/core/` fails
+  `npm run lint`.
 
 ### 0005 — Folder structure & path aliases
 
