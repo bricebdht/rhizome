@@ -18,6 +18,13 @@ rewrite.
   the most mature; adding a second language while learning the protocol would
   add cognitive load for no clear gain. A Go firehose consumer or a light
   custom AppView is a candidate for phase 2.
+- **Schema changes are near-impossible after publication.** Records live in
+  users' repos, which we cannot write to, so AT Protocol forbids breaking
+  lexicon changes rather than offering a migration path: optional fields can
+  be added, nothing else. A real break means a new NSID and reading both
+  collections forever. V1 therefore drafts under
+  `app.rhizome.experimental.*` and promotes once the shape has survived being
+  built on (tickets 0101, 0102, 0104).
 - **Data model: one generic `progress` object** in the lexicon, shaped
   differently per media type (season/episode for series, boolean for films,
   percent/hours for games, page/chapter for books). The anti-spoiler engine
