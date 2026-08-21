@@ -1,0 +1,17 @@
+# Normalize to LF everywhere, including in the working tree on Windows.
+#
+# Without this, core.autocrlf=true checks files out with CRLF while git
+# stores them as LF. Prettier defaults to endOfLine: "lf", so every file
+# reads as unformatted on a Windows machine — and CI, running on Linux,
+# cannot reproduce it. `eol=lf` (not just `text=auto`) is the part that
+# fixes the working tree rather than only the stored blob.
+* text=auto eol=lf
+
+# Binaries git should never touch.
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.woff binary
+*.woff2 binary
