@@ -1,4 +1,12 @@
 {
+  /* Solution-style: no sources of its own, just the project list.
+
+     It extends tsconfig.base.json purely so tooling that reads
+     tsconfig.json directly — shadcn's CLI among others — can find the @/*
+     mapping. TypeScript itself gets it through each referenced project,
+     which extends the same base. Duplicating the paths here instead would
+     be a second copy to keep in sync. */
+  "extends": "./tsconfig.base.json",
   "files": [],
   "references": [
     { "path": "./tsconfig.app.json" },

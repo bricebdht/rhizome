@@ -9,15 +9,15 @@ Two questions decide where a file goes:
 
 ## The layers
 
-| Folder        | What lives here                                                       | Survives a React Native port?      |
-| ------------- | --------------------------------------------------------------------- | ---------------------------------- |
-| `app/`        | app shell: root component, routing, providers                         | no                                 |
-| `components/` | reusable presentational components (shadcn/ui lives here)             | no                                 |
-| `features/`   | one folder per feature: its UI, hooks, and glue                       | no                                 |
-| `state/`      | Zustand slices                                                        | no                                 |
-| `lib/`        | **browser-specific adapters** — the implementations `core/` is handed | no, but it is small and deliberate |
-| `core/`       | **platform-agnostic domain code**                                     | **yes — this is the point**        |
-| `types/`      | shared ambient / cross-cutting types                                  | n/a                                |
+| Folder        | What lives here                                                                                           | Survives a React Native port?      |
+| ------------- | --------------------------------------------------------------------------------------------------------- | ---------------------------------- |
+| `app/`        | app shell: root component, routing, providers                                                             | no                                 |
+| `components/` | reusable presentational components (shadcn/ui lives here)                                                 | no                                 |
+| `features/`   | one folder per feature: its UI, hooks, and glue                                                           | no                                 |
+| `state/`      | Zustand slices                                                                                            | no                                 |
+| `lib/`        | **the web layer**: browser-specific adapters `core/` is handed, plus web-only helpers (`cn`, env reading) | no, but it is small and deliberate |
+| `core/`       | **platform-agnostic domain code**                                                                         | **yes — this is the point**        |
+| `types/`      | shared ambient / cross-cutting types                                                                      | n/a                                |
 
 Folders are created when something goes in them, not up front.
 
@@ -54,6 +54,17 @@ Two clarifications worth keeping in mind, because they are easy to get wrong:
 
 The boundary is enforced by the ESLint rules and the DOM-free
 `tsconfig.core.json` in ticket 0002 — not by good intentions.
+
+### A note on `lib/utils.ts`
+
+shadcn/ui generates its `cn()` class-name merger at `@/lib/utils`, and every
+snippet on its site imports from there. That path stays as-is rather than
+being relocated somewhere more semantically precise: the helper is web-only
+either way, `core/` cannot import it (lint error), and diverging from the
+convention would break every component someone pastes in later.
+
+So read `lib/` as _the web layer_ rather than strictly _adapters_. The
+guarantee that matters is the one-way dependency, and that is enforced.
 
 ## Imports
 
