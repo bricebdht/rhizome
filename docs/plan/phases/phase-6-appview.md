@@ -29,6 +29,43 @@ Scope in:
 - Option B — **AppView**: an always-on service consumes the firehose,
   indexes records, exposes a read API. Infrastructure and operations, but it
   is the only option that can answer network-wide questions.
+- Option C — **the index as records in a repo we own**: instead of a private
+  database plus a read API, write one small reference record per indexed
+  comment into our own repo, and let the client read it with plain
+  `listRecords`. References, never copies — the comments themselves stay in
+  their authors' repos.
+  This works, and the mechanism should be recorded because it is not
+  obvious: `listRecords` with `reverse=true` returns records in ascending
+  `rkey` order and accepts an arbitrary prefix as `cursor`, so encoding the
+  anchor `(source, externalId, season, episode)` into the `rkey` turns
+  "fetch this episode's comments" into a prefix range scan, with
+  pagination-on-scroll falling out of the cursor for free.
+  _Verified 2026-08-22 against `bsky.social`: `cursor=3jz` returned
+  `3jzaiuyoykf2r, 3jzaiwxn7oy2n, 3jzaj2f4mz32x` in order._
+  - **What it buys**: no read API and no database of ours to operate
+    (0604-0605 disappear), and the index becomes public and reusable by any
+    other client.
+  - **What it does not buy**: the always-on process. Something must still
+    consume the firehose to write those references — 0603 is unchanged, and
+    that is the harder two-thirds.
+  - **What it costs**: every reference is a signed commit, so we would emit
+    firehose traffic proportional to network activity and grow a repo that
+    never shrinks — and repos are Merkle trees, where multi-million-record
+    sizes are a known pain. Flag counting moves to the client (read every
+    reference and tally) where SQLite does it with a `GROUP BY`. And our repo
+    is just as much a single point of failure as a database would be.
+  - **What would flip the decision**: wanting the index to be readable by
+    clients other than ours. At that point Option C is clearly better, and
+    switching is a rewrite of this service rather than a data migration —
+    the lexicon never sees the difference, because comments and flags live in
+    their authors' repos under all three options.
+- Rejected outright, and worth recording so it is not re-proposed: **running
+  a PDS of our own that holds the comments**. Records are signed by the DID
+  owning the repo, so comments in our repo would be signed by us — authorship
+  becomes a field we assert rather than a cryptographic fact. Users cannot
+  write to a repo they do not own, so it would also need a write API in
+  front, making it authoritative: deleting it would lose data. And operating a
+  PDS is strictly more work than operating an index.
 - The comparison must be per data type rather than global — that is the
   actual shape of the decision:
   - **media entries** (`app.rhizome.*.media.entry`) → A. The reader only
@@ -48,7 +85,12 @@ Goal: bound the service before writing it, since an index that grows into a
 backend would quietly undo the whole architecture.
 Scope in:
 
-- Decision recorded at the top of `docs/architecture/feed-aggregation.md`.
+- Decision recorded at the top of `docs/architecture/feed-aggregation.md`,
+  including **which shape** the index takes — private database plus read API
+  (B), or reference records in a repo (C). Default expectation is B for V1
+  because it is the smaller thing to operate and flag counting stays a
+  `GROUP BY`; C is the better answer the day other clients should be able to
+  read the index, and 0601 records what would flip it.
 - **Indexed in V1**: episode comments, spoiler flags. Nothing else.
 - **Explicitly not indexed in V1**: media entries. The follows feed keeps
   reading repos directly (0701) so that an AppView outage cannot take the
